@@ -5,15 +5,20 @@
  */
 package br.ufrn.imd.lp2.gui;
 
-import br.ufrn.imd.lp2.imagem.Image;
+import br.ufrn.imd.lp2.annotation.Annotation;
+import br.ufrn.imd.lp2.imagem.Images;
 import br.ufrn.imd.lp2.segmentation.Segmentation;
+import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  *
@@ -24,17 +29,19 @@ public class ProjetoGUI extends javax.swing.JFrame {
     /**
      * Creates new form ProjetoGUI
      */
-    private Image buffer;
+    private Images buffer;
     private Segmentation segmentation;
+    private Annotation annotation;
+    private Persistence persistence;
 
     public ProjetoGUI() {
         initComponents();
-        buffer = new Image();
+        buffer = new Images();
         configSetup();
     }
 
     public void configSetup() {
-        btnSegmental.setEnabled(false);
+        btnSegmentation.setEnabled(false);
         resetImageAreas();
     }
 
@@ -45,15 +52,37 @@ public class ProjetoGUI extends javax.swing.JFrame {
         imageMarked.setText("Marked");
         imageSegmented.setIcon(new ImageIcon());
         imageSegmented.setText("Segmented");
+        imageAnnotation.setIcon(new ImageIcon());
+        imageAnnotation.setText("Annotaded");
+        textAreaLabels.setText(null);
         labelTotalRegions.setText("");
-        
     }
-
-    public void setImage(Image buffer) {
+    
+    public int scale(int scaleA, int scaleB){
+        if(scaleA < scaleB){
+           return scaleA;
+        } else
+            return scaleB;
+            
+    }
+    
+    public void setImage(JLabel label, JPanel pane, BufferedImage buffer) {
         if (buffer != null) {
-            imageOriginal.setIcon(new ImageIcon(buffer.getImage()));
-            imageOriginal.setText("");
-            imageOriginal.repaint();
+            label.setSize(pane.getSize());
+            //pane.setSize(label.getSize());
+
+            //dimencionar imagem
+            int width, height, scale;
+            width = scale(buffer.getWidth(), label.getWidth());
+            height = scale(buffer.getHeight(), label.getHeight());
+            scale = scale(width,height);
+            
+            //Image img = buffer.getScaledInstance(scale, scale, BufferedImage.SCALE_DEFAULT);
+            label.setIcon(new ImageIcon(buffer));
+
+            label.setText("");
+            label.setVisible(true);
+            label.repaint();
         }
     }
 
@@ -71,11 +100,11 @@ public class ProjetoGUI extends javax.swing.JFrame {
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel3 = new javax.swing.JPanel();
+        jPanelImageOriginal = new javax.swing.JPanel();
         imageOriginal = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
+        jPanelImageMarked = new javax.swing.JPanel();
         imageMarked = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
+        jPanelImageSegmented = new javax.swing.JPanel();
         imageSegmented = new javax.swing.JLabel();
         jPanelConfig = new javax.swing.JPanel();
         paramBlurLevel = new javax.swing.JSpinner();
@@ -85,17 +114,21 @@ public class ProjetoGUI extends javax.swing.JFrame {
         paramColorRadius = new javax.swing.JSpinner();
         paramMinSize = new javax.swing.JSpinner();
         jButton1 = new javax.swing.JButton();
-        btnSegmental = new javax.swing.JButton();
+        btnSegmentation = new javax.swing.JButton();
         btnLoadImage = new javax.swing.JButton();
         labelTotalRegions = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
+        jPanelImageAnnotation = new javax.swing.JPanel();
+        imageAnnotation = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jTextField1 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        textAreaLabels = new javax.swing.JTextArea();
+        paramTagName = new javax.swing.JTextField();
+        btnAddTag = new javax.swing.JButton();
+        paramHighlightLevel = new javax.swing.JSpinner();
+        labelHihlightLevel = new javax.swing.JLabel();
+        labelRegionNumber = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -116,62 +149,65 @@ public class ProjetoGUI extends javax.swing.JFrame {
 
         imageOriginal.setText("ImageOriginal");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelImageOriginalLayout = new javax.swing.GroupLayout(jPanelImageOriginal);
+        jPanelImageOriginal.setLayout(jPanelImageOriginalLayout);
+        jPanelImageOriginalLayout.setHorizontalGroup(
+            jPanelImageOriginalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelImageOriginalLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(imageOriginal)
-                .addGap(0, 434, Short.MAX_VALUE))
+                .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        jPanelImageOriginalLayout.setVerticalGroup(
+            jPanelImageOriginalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelImageOriginalLayout.createSequentialGroup()
                 .addComponent(imageOriginal)
-                .addGap(0, 444, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Original", jPanel3);
+        jTabbedPane1.addTab("Original", jPanelImageOriginal);
 
         imageMarked.setText("imageMarked");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelImageMarkedLayout = new javax.swing.GroupLayout(jPanelImageMarked);
+        jPanelImageMarked.setLayout(jPanelImageMarkedLayout);
+        jPanelImageMarkedLayout.setHorizontalGroup(
+            jPanelImageMarkedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelImageMarkedLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(imageMarked)
-                .addGap(0, 435, Short.MAX_VALUE))
+                .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        jPanelImageMarkedLayout.setVerticalGroup(
+            jPanelImageMarkedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelImageMarkedLayout.createSequentialGroup()
                 .addComponent(imageMarked)
-                .addGap(0, 444, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Marked", jPanel4);
+        jTabbedPane1.addTab("Marked", jPanelImageMarked);
 
-        jPanel5.setPreferredSize(new java.awt.Dimension(150, 350));
+        jPanelImageSegmented.setPreferredSize(new java.awt.Dimension(150, 350));
 
         imageSegmented.setText("imageSegmented");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelImageSegmentedLayout = new javax.swing.GroupLayout(jPanelImageSegmented);
+        jPanelImageSegmented.setLayout(jPanelImageSegmentedLayout);
+        jPanelImageSegmentedLayout.setHorizontalGroup(
+            jPanelImageSegmentedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelImageSegmentedLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(imageSegmented)
-                .addGap(0, 407, Short.MAX_VALUE))
+                .addContainerGap())
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        jPanelImageSegmentedLayout.setVerticalGroup(
+            jPanelImageSegmentedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelImageSegmentedLayout.createSequentialGroup()
                 .addComponent(imageSegmented)
-                .addGap(0, 444, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Segmented", jPanel5);
+        jTabbedPane1.addTab("Segmented", jPanelImageSegmented);
 
         jPanelConfig.setBorder(javax.swing.BorderFactory.createTitledBorder("Menu"));
 
@@ -189,10 +225,10 @@ public class ProjetoGUI extends javax.swing.JFrame {
 
         jButton1.setText("Load Label Map");
 
-        btnSegmental.setText("Segmental");
-        btnSegmental.addActionListener(new java.awt.event.ActionListener() {
+        btnSegmentation.setText("Segmental");
+        btnSegmentation.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSegmentalActionPerformed(evt);
+                btnSegmentationActionPerformed(evt);
             }
         });
 
@@ -219,14 +255,14 @@ public class ProjetoGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(paramColorRadius)
-                            .addComponent(paramMinSize, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)))
+                            .addComponent(paramMinSize)))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelConfigLayout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(paramBlurLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnLoadImage, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSegmental, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSegmentation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(labelTotalRegions, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -248,13 +284,12 @@ public class ProjetoGUI extends javax.swing.JFrame {
                 .addGroup(jPanelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(paramMinSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
                 .addGroup(jPanelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelTotalRegions, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanelConfigLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel5)))
+                    .addComponent(jLabel5))
                 .addGap(18, 18, 18)
-                .addComponent(btnSegmental)
+                .addComponent(btnSegmentation)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -266,45 +301,65 @@ public class ProjetoGUI extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanelConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanelConfig, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanelConfig, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addComponent(jTabbedPane1))
         );
 
         jTabbedPane2.addTab("Segmentation", jPanel1);
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Images"));
+        jPanelImageAnnotation.setBorder(javax.swing.BorderFactory.createTitledBorder("Images"));
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 488, Short.MAX_VALUE)
+        imageAnnotation.setText("imageAnnotation");
+        imageAnnotation.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                imageAnnotationMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelImageAnnotationLayout = new javax.swing.GroupLayout(jPanelImageAnnotation);
+        jPanelImageAnnotation.setLayout(jPanelImageAnnotationLayout);
+        jPanelImageAnnotationLayout.setHorizontalGroup(
+            jPanelImageAnnotationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelImageAnnotationLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(imageAnnotation)
+                .addContainerGap())
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        jPanelImageAnnotationLayout.setVerticalGroup(
+            jPanelImageAnnotationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelImageAnnotationLayout.createSequentialGroup()
+                .addComponent(imageAnnotation)
+                .addContainerGap())
         );
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Annotation"));
 
-        jTextArea1.setColumns(15);
-        jTextArea1.setRows(5);
-        jTextArea1.setTabSize(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        textAreaLabels.setColumns(15);
+        textAreaLabels.setRows(5);
+        textAreaLabels.setTabSize(5);
+        jScrollPane1.setViewportView(textAreaLabels);
 
-        jTextField1.setText("jTextField1");
+        btnAddTag.setText("+");
+        btnAddTag.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddTagActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("+");
+        paramHighlightLevel.setModel(new javax.swing.SpinnerNumberModel(50, 1, 100, 5));
+
+        labelHihlightLevel.setText("Highlight Level:");
+
+        labelRegionNumber.setText("Label:");
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -313,23 +368,39 @@ public class ProjetoGUI extends javax.swing.JFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(jTextField1)
+                        .addComponent(paramTagName)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnAddTag, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(labelRegionNumber)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(labelHihlightLevel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                                .addComponent(paramHighlightLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(paramHighlightLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelHihlightLevel))
+                .addGap(29, 29, 29)
+                .addComponent(labelRegionNumber)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
-                .addContainerGap(270, Short.MAX_VALUE))
+                    .addComponent(paramTagName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAddTag))
+                .addContainerGap(259, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
@@ -338,19 +409,18 @@ public class ProjetoGUI extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanelImageAnnotation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(38, Short.MAX_VALUE))
+                    .addComponent(jPanelImageAnnotation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jTabbedPane2.addTab("Annotation", jPanel6);
@@ -361,15 +431,15 @@ public class ProjetoGUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane2)
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 576, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTabbedPane2)
+                .addContainerGap())
         );
 
         pack();
@@ -380,48 +450,128 @@ public class ProjetoGUI extends javax.swing.JFrame {
 
         int res = fc.showOpenDialog(null);
         if (res == JFileChooser.APPROVE_OPTION) {
-            File arquivo = fc.getSelectedFile();
-            buffer.setFilepath(arquivo.getAbsolutePath());
-
+            File file = fc.getSelectedFile();
+            buffer.setFilepath(file.getAbsolutePath());
+            
             try {
-                buffer.setImage(ImageIO.read(arquivo));
+                buffer.setImage(ImageIO.read(file));
             } catch (IOException exc) {
                 JOptionPane.showMessageDialog(null,
-                    "Erro ao carregar a imagem: "
-                    + exc.getMessage());
+                        "Erro ao carregar a imagem: "
+                        + exc.getMessage());
             }
 
             this.resetImageAreas();
+            jTabbedPane1.setSelectedIndex(jTabbedPane1.indexOfTab("Original"));
 
-            this.setImage(buffer);
+            this.setImage(imageOriginal, jPanelImageOriginal, buffer.getImage());
+
             //habilita o btnSegmental
-            btnSegmental.setEnabled(true);
+            btnSegmentation.setEnabled(true);
 
         }
     }//GEN-LAST:event_btnLoadImageActionPerformed
 
-    private void btnSegmentalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSegmentalActionPerformed
+    private void btnSegmentationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSegmentationActionPerformed
         // TODO add your handling code here:
         if (buffer != null) {
-            segmentation = new Segmentation(buffer);
-            segmentation.applySegmental((double) paramBlurLevel.getValue(),
-                (double) paramColorRadius.getValue(),
-                (double) paramMinSize.getValue());
+            segmentation = new Segmentation(buffer.getFilepath(), (double) paramBlurLevel.getValue(),
+                    (double) paramColorRadius.getValue(),
+                    (double) paramMinSize.getValue());
 
-            labelTotalRegions.setText("Gererated Regions: " + segmentation.getImageRAW().getTotalRegions());
+            annotation = new Annotation();
+
+            labelTotalRegions.setText("Gererated Regions: " + segmentation.getRAW().getTotalRegions());
 
             //Mostra a imagem marcada
-            imageMarked.setIcon(new ImageIcon(segmentation.getMarkedImage()));
-            imageMarked.setText(null);
-            imageMarked.repaint();
+            setImage(imageMarked, jPanelImageMarked, segmentation.getRAW().getRegionMarkedImage());
+
+            //Prepara a imagem para anotacao
+            setImage(imageAnnotation, jPanelImageAnnotation, segmentation.getRAW().getRegionMarkedImage());
 
             //Mostra a imagem segmentada
-            imageSegmented.setIcon(new ImageIcon(segmentation.getMapLabels().getImage()));
-            imageSegmented.setText(null);
-            imageSegmented.repaint();
+            setImage(imageSegmented, jPanelImageSegmented, segmentation.getMapLabels().getImage());
 
+            //Muda a visão para a imagem segmentada
+            jTabbedPane1.setSelectedIndex(jTabbedPane1.indexOfTab("Marked"));
+
+            persistence = new Persistence(segmentation);
+            persistence.save();
         }
-    }//GEN-LAST:event_btnSegmentalActionPerformed
+    }//GEN-LAST:event_btnSegmentationActionPerformed
+
+    private void imageAnnotationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_imageAnnotationMouseClicked
+        // TODO add your handling code here:
+        int x, y, region, regionSelected;
+        int[] mask, grayMap;
+        int r, g, b;
+        int param = 100 / (int) paramHighlightLevel.getValue();
+        Color pixel;
+        buffer.setImage(new BufferedImage(segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), 1));
+
+        x = evt.getX();
+        y = evt.getY();
+
+        region = segmentation.getMapLabels().getImage().getRGB(x, y);
+
+        mask = new int[segmentation.getRAW().getRegionMarkedPixels().length];
+        for (int i = 0; i < mask.length; i++) {
+            mask[i] = segmentation.getRAW().getRegionMarkedPixels()[i];
+        }
+
+        grayMap = segmentation.getRAW().getSegmentedImageMap();
+
+        //Selecao de regioes
+        for (int i = 0; i < mask.length; i++) {
+            pixel = new Color(mask[i]);
+
+            if (grayMap[i] != region) {
+                r = pixel.getRed() / param;
+                g = pixel.getGreen() / param;
+                b = pixel.getBlue() / param;
+                pixel = new Color(r, g, b);
+
+                mask[i] = pixel.getRGB();
+            } else {
+                r = pixel.getRed();
+                g = pixel.getGreen();
+                b = pixel.getBlue();
+                pixel = new Color(r, g, b);
+
+                mask[i] = pixel.getRGB();
+            }
+        }
+
+        buffer.getImage().setRGB(0, 0, segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), mask, 0, segmentation.getRAW().getWidth());
+
+        //atualiza a imagem gerada
+        this.setImage(imageAnnotation, jPanelImageAnnotation, buffer.getImage());
+
+        //Guarda o numero da regiao selecionada
+        pixel = new Color(region);
+        regionSelected = pixel.getRed() / segmentation.getScaleSegmentarion();
+        annotation.setRegionSelected(regionSelected);
+
+        //
+        if (segmentation.getMapLabels().getLabels(regionSelected) != null) {
+            textAreaLabels.setText(segmentation.getMapLabels().getLabels(regionSelected));
+        } else {
+            textAreaLabels.setText(null);
+        }
+
+        //Mostra o numero da regiao selecionada
+        labelRegionNumber.setText("Label: " + regionSelected);
+    }//GEN-LAST:event_imageAnnotationMouseClicked
+
+    private void btnAddTagActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTagActionPerformed
+        // TODO add your handling code here:
+        if (!paramTagName.getText().equals("")) {
+            segmentation.getMapLabels().setLabels(annotation.getRegionSelected(),
+                    paramTagName.getText());
+            textAreaLabels.setText(segmentation.getMapLabels().getLabels(annotation.getRegionSelected()));
+            paramTagName.setText(null);
+        }
+    }//GEN-LAST:event_btnAddTagActionPerformed
 
     /**
      * @param args the command line arguments
@@ -437,16 +587,21 @@ public class ProjetoGUI extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ProjetoGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ProjetoGUI.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ProjetoGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ProjetoGUI.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ProjetoGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ProjetoGUI.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ProjetoGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ProjetoGUI.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -459,35 +614,39 @@ public class ProjetoGUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddTag;
     private javax.swing.JButton btnLoadImage;
-    private javax.swing.JButton btnSegmental;
+    private javax.swing.JButton btnSegmentation;
+    private javax.swing.JLabel imageAnnotation;
     private javax.swing.JLabel imageMarked;
     private javax.swing.JLabel imageOriginal;
     private javax.swing.JLabel imageSegmented;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPanelConfig;
+    private javax.swing.JPanel jPanelImageAnnotation;
+    private javax.swing.JPanel jPanelImageMarked;
+    private javax.swing.JPanel jPanelImageOriginal;
+    private javax.swing.JPanel jPanelImageSegmented;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JLabel labelHihlightLevel;
+    private javax.swing.JLabel labelRegionNumber;
     private javax.swing.JLabel labelTotalRegions;
     private javax.swing.JSpinner paramBlurLevel;
     private javax.swing.JSpinner paramColorRadius;
+    private javax.swing.JSpinner paramHighlightLevel;
     private javax.swing.JSpinner paramMinSize;
+    private javax.swing.JTextField paramTagName;
+    private javax.swing.JTextArea textAreaLabels;
     // End of variables declaration//GEN-END:variables
 }

@@ -14,13 +14,13 @@ import java.awt.image.BufferedImage;
  *
  * @author edilvolima
  */
-public class Image {
+public class Images {
 
     private BufferedImage image;
     private String filepath;
 
     
-    public Image(){
+    public Images(){
         this.image = null;
         this.filepath = null;
     }
@@ -29,8 +29,8 @@ public class Image {
         return image;
     }
 
-    public void setImage(BufferedImage originalImage) {
-        this.image = originalImage;
+    public void setImage(BufferedImage image) {
+        this.image = image;
     }
 
     public String getFilepath() {

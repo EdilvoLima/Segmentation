@@ -13,17 +13,30 @@ import java.util.Arrays;
  * @author edilvolima
  */
 public class Annotation {
-    private ArrayList<String> tags;
     
-    public Annotation(){
-        tags = new ArrayList<>();
+    private Integer regionSelected;
+    private String tag;
+    
+    public Annotation (){
+        regionSelected = null;
+        tag = "";
+    }
+
+    public Integer getRegionSelected() {
+        return regionSelected;
+    }
+
+    public void setRegionSelected(int regionSelected) {
+        this.regionSelected = regionSelected;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
     
-    public void addAnnotation(String[] tags){
-        this.tags.addAll(Arrays.asList(tags));
-    }
     
-    public void addAnnotations(String tag){
-        this.tags.add(tag);
-    }
 }

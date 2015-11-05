@@ -5,105 +5,75 @@
  */
 package br.ufrn.imd.lp2.segmentation;
 
-import br.ufrn.imd.lp2.imagem.Image;
+import br.ufrn.imd.lp2.imagem.Images;
 import br.ufrn.imd.lp2.imagesegmentation.ImageInformation;
 import br.ufrn.imd.lp2.imagesegmentation.ImageSegmentation;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 
 /**
  *
  * @author edilvolima
  */
-public class Segmentation {
+public class Segmentation extends Images implements Serializable{
 
-    private ImageInformation ImageRAW;
-    private BufferedImage originalImage;
-    private BufferedImage markedImage;
-    private String filepath;
-    private MapLabels mapLabels;
-    private int scaleSegmentarion;
+    private ImageInformation RAW;
+    private MapRegion mapRegion;
+    private int scaleSegmentation;
 
-    public Segmentation(Image image) {
-        this.originalImage = image.getImage();
-        this.filepath = image.getFilepath();
-        mapLabels = new MapLabels();
+    public Segmentation(String filepath, double blur_level, double color_radius, double min_size) {
+        super.setFilepath(filepath);
+        mapRegion = new MapRegion();
+        
+        RAW = ImageSegmentation.performSegmentation(filepath, blur_level, color_radius, min_size);
+        scaleSegmentation = 255 / RAW.getTotalRegions();
+
+        mapRegion.setImageMapped(RAW.getRegionMarkedImage());
+        mapRegion.getImage().setRGB(0, 0, RAW.getWidth(), RAW.getHeight(), grayMap(RAW.getSegmentedImageMap()), 0, RAW.getWidth());
     }
 
-    public Segmentation() {
-
-    }
-
-    public void applySegmental(double blur_level, double color_radius, double min_size) {
-        ImageRAW = ImageSegmentation.performSegmentation(filepath, blur_level, color_radius, min_size);
-        originalImage = ImageRAW.getOriginalImage();
-        markedImage = ImageRAW.getRegionMarkedImage();
-        scaleSegmentarion = 255 / ImageRAW.getTotalRegions();
-
-        mapLabels.setImageMapped(originalImage);
-        mapLabels.getImage().setRGB(0, 0, ImageRAW.getWidth(), ImageRAW.getHeight(), grayMap(ImageRAW.getSegmentedImageMap()), 0, ImageRAW.getWidth());
-    }
-    
-    
     public int[] grayMap(int[] mtz) {
         for (int i = 0; i < mtz.length; i++) {
             int pix = mtz[i];
 
-            Color c = new Color(scaleSegmentarion * pix, scaleSegmentarion * pix, scaleSegmentarion * pix);
+            Color c = new Color(scaleSegmentation * pix, scaleSegmentation * pix, scaleSegmentation * pix);
 
             mtz[i] = c.getRGB();
         }
         return mtz;
     }
 
-    public ImageInformation getImageRAW() {
-        return ImageRAW;
+    public ImageInformation getRAW() {
+        return RAW;
     }
 
-    public void setImageRAW(ImageInformation ImageRAW) {
-        this.ImageRAW = ImageRAW;
+    public void setRAW(ImageInformation RAW) {
+        this.RAW = RAW;
     }
 
     public BufferedImage getOriginalImage() {
-        return originalImage;
-    }
-
-    public void setOriginalImage(BufferedImage originalImage) {
-        this.originalImage = originalImage;
+        return RAW.getOriginalImage();
     }
 
     public BufferedImage getMarkedImage() {
-        return markedImage;
+        return RAW.getRegionMarkedImage();
     }
-
-    public void setMarkedImage(BufferedImage markedImage) {
-        this.markedImage = markedImage;
-    }
-
-    public String getFilepath() {
-        return filepath;
-    }
-
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
-    }
-
 
     public int getScaleSegmentarion() {
-        return scaleSegmentarion;
+        return scaleSegmentation;
     }
 
     public void setScaleSegmentarion(int scaleSegmentarion) {
-        this.scaleSegmentarion = scaleSegmentarion;
+        this.scaleSegmentation = scaleSegmentarion;
     }
 
-    public MapLabels getMapLabels() {
-        return mapLabels;
+    public MapRegion getMapLabels() {
+        return mapRegion;
     }
 
-    public void setMapLabels(MapLabels mapLabels) {
-        this.mapLabels = mapLabels;
+    public void setMapLabels(MapRegion mapLabels) {
+        this.mapRegion = mapLabels;
     }
-    
-    
+
 }
