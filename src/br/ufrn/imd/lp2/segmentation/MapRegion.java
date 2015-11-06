@@ -10,6 +10,7 @@ import br.ufrn.imd.lp2.annotation.Tag;
 import br.ufrn.imd.lp2.imagem.Images;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -34,8 +35,14 @@ public class MapRegion extends Images implements Tagging, Serializable{
         return labels.get(key);
     }
 
-    public void setLabels(Integer key, String tags) {
-        labels.put(key, tags);
+    public void setLabels(Integer key, String tag) {
+        labels.put(key, tag);
+    }
+    
+    public void setLabels(ArrayList<Integer> regions, String tag){
+        for(Integer key : regions){
+            labels.put(key, tag);
+        }
     }
     
 }

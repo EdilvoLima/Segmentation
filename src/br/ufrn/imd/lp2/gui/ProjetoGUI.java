@@ -13,6 +13,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -57,29 +58,19 @@ public class ProjetoGUI extends javax.swing.JFrame {
         textAreaLabels.setText(null);
         labelTotalRegions.setText("");
     }
-    
-    public int scale(int scaleA, int scaleB){
-        if(scaleA < scaleB){
-           return scaleA;
-        } else
+
+    public int scale(int scaleA, int scaleB) {
+        if (scaleA < scaleB) {
+            return scaleA;
+        } else {
             return scaleB;
-            
+        }
+
     }
-    
-    public void setImage(JLabel label, JPanel pane, BufferedImage buffer) {
+
+    public void setImage(JLabel label, BufferedImage buffer) {
         if (buffer != null) {
-            label.setSize(pane.getSize());
-            //pane.setSize(label.getSize());
-
-            //dimencionar imagem
-            int width, height, scale;
-            width = scale(buffer.getWidth(), label.getWidth());
-            height = scale(buffer.getHeight(), label.getHeight());
-            scale = scale(width,height);
-            
-            //Image img = buffer.getScaledInstance(scale, scale, BufferedImage.SCALE_DEFAULT);
             label.setIcon(new ImageIcon(buffer));
-
             label.setText("");
             label.setVisible(true);
             label.repaint();
@@ -452,7 +443,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
         if (res == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             buffer.setFilepath(file.getAbsolutePath());
-            
+
             try {
                 buffer.setImage(ImageIO.read(file));
             } catch (IOException exc) {
@@ -464,7 +455,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
             this.resetImageAreas();
             jTabbedPane1.setSelectedIndex(jTabbedPane1.indexOfTab("Original"));
 
-            this.setImage(imageOriginal, jPanelImageOriginal, buffer.getImage());
+            this.setImage(imageOriginal, buffer.getImage());
 
             //habilita o btnSegmental
             btnSegmentation.setEnabled(true);
@@ -484,13 +475,13 @@ public class ProjetoGUI extends javax.swing.JFrame {
             labelTotalRegions.setText("Gererated Regions: " + segmentation.getRAW().getTotalRegions());
 
             //Mostra a imagem marcada
-            setImage(imageMarked, jPanelImageMarked, segmentation.getRAW().getRegionMarkedImage());
+            setImage(imageMarked, segmentation.getRAW().getRegionMarkedImage());
 
             //Prepara a imagem para anotacao
-            setImage(imageAnnotation, jPanelImageAnnotation, segmentation.getRAW().getRegionMarkedImage());
+            setImage(imageAnnotation, segmentation.getRAW().getRegionMarkedImage());
 
             //Mostra a imagem segmentada
-            setImage(imageSegmented, jPanelImageSegmented, segmentation.getMapLabels().getImage());
+            setImage(imageSegmented, segmentation.getMapLabels().getImage());
 
             //Muda a visão para a imagem segmentada
             jTabbedPane1.setSelectedIndex(jTabbedPane1.indexOfTab("Marked"));
@@ -502,71 +493,85 @@ public class ProjetoGUI extends javax.swing.JFrame {
 
     private void imageAnnotationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_imageAnnotationMouseClicked
         // TODO add your handling code here:
-        int x, y, region, regionSelected;
+        int x, y, region;
+        int regionSelected = -1;
         int[] mask, grayMap;
         int r, g, b;
-        int param = 100 / (int) paramHighlightLevel.getValue();
+        int param = (int) paramHighlightLevel.getValue();
         Color pixel;
-        buffer.setImage(new BufferedImage(segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), 1));
+        //buffer.setImage(new BufferedImage(segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), 1));
 
+        buffer.setImage(segmentation.getOriginalImage());
         x = evt.getX();
         y = evt.getY();
 
         region = segmentation.getMapLabels().getImage().getRGB(x, y);
 
-        mask = new int[segmentation.getRAW().getRegionMarkedPixels().length];
-        for (int i = 0; i < mask.length; i++) {
-            mask[i] = segmentation.getRAW().getRegionMarkedPixels()[i];
-        }
-
+        mask = annotation.createMask(segmentation.getRAW().getRegionMarkedPixels());
+        //mask = segmentation.getRAW().getOriginalPixels();
         grayMap = segmentation.getRAW().getSegmentedImageMap();
 
         //Selecao de regioes
         for (int i = 0; i < mask.length; i++) {
             pixel = new Color(mask[i]);
-
-            if (grayMap[i] != region) {
-                r = pixel.getRed() / param;
-                g = pixel.getGreen() / param;
-                b = pixel.getBlue() / param;
+//            System.out.println(grayMap[i]);
+//            System.out.println(mask[i]);
+            if (region != grayMap[i] && 
+                !annotation.regionsExist(annotation.getRegionLabel(grayMap[i], segmentation.getRAW().getTotalRegions()))) {
+                
+                r = pixel.getRed() * param / 100;
+                g = pixel.getGreen() * param / 100;
+                b = pixel.getBlue() * param / 100;
                 pixel = new Color(r, g, b);
 
                 mask[i] = pixel.getRGB();
+                
             } else {
-                r = pixel.getRed();
+
+               r = pixel.getRed();
                 g = pixel.getGreen();
                 b = pixel.getBlue();
                 pixel = new Color(r, g, b);
 
-                mask[i] = pixel.getRGB();
+                mask[i] = pixel.getRGB(); 
+
             }
         }
 
-        buffer.getImage().setRGB(0, 0, segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), mask, 0, segmentation.getRAW().getWidth());
+        annotation.printRegions();
+
+        buffer.getImage()
+                .setRGB(0, 0, segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), mask, 0, segmentation.getRAW().getWidth());
 
         //atualiza a imagem gerada
-        this.setImage(imageAnnotation, jPanelImageAnnotation, buffer.getImage());
+        this.setImage(imageAnnotation, buffer.getImage());
 
         //Guarda o numero da regiao selecionada
-        pixel = new Color(region);
-        regionSelected = pixel.getRed() / segmentation.getScaleSegmentarion();
+        regionSelected = annotation.getRegionLabel(region, segmentation.getRAW().getTotalRegions());
+
+        System.out.println(regionSelected);
+
         annotation.setRegionSelected(regionSelected);
 
+        annotation.addRegion(regionSelected);
+
         //
-        if (segmentation.getMapLabels().getLabels(regionSelected) != null) {
+        if (segmentation.getMapLabels()
+                .getLabels(regionSelected) != null) {
             textAreaLabels.setText(segmentation.getMapLabels().getLabels(regionSelected));
         } else {
             textAreaLabels.setText(null);
         }
 
         //Mostra o numero da regiao selecionada
-        labelRegionNumber.setText("Label: " + regionSelected);
+        labelRegionNumber.setText(
+                "Label: " + regionSelected);
     }//GEN-LAST:event_imageAnnotationMouseClicked
 
     private void btnAddTagActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTagActionPerformed
         // TODO add your handling code here:
         if (!paramTagName.getText().equals("")) {
-            segmentation.getMapLabels().setLabels(annotation.getRegionSelected(),
+            segmentation.getMapLabels().setLabels(annotation.getRegions(),
                     paramTagName.getText());
             textAreaLabels.setText(segmentation.getMapLabels().getLabels(annotation.getRegionSelected()));
             paramTagName.setText(null);

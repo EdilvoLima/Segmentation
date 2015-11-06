@@ -29,7 +29,7 @@ public class Segmentation extends Images implements Serializable{
         RAW = ImageSegmentation.performSegmentation(filepath, blur_level, color_radius, min_size);
         scaleSegmentation = 255 / RAW.getTotalRegions();
 
-        mapRegion.setImageMapped(RAW.getRegionMarkedImage());
+        mapRegion.setImageMapped(RAW.getOriginalImage());
         mapRegion.getImage().setRGB(0, 0, RAW.getWidth(), RAW.getHeight(), grayMap(RAW.getSegmentedImageMap()), 0, RAW.getWidth());
     }
 
