@@ -120,6 +120,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
         paramHighlightLevel = new javax.swing.JSpinner();
         labelHihlightLevel = new javax.swing.JLabel();
         labelRegionNumber = new javax.swing.JLabel();
+        btnClearSelection = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -352,6 +353,13 @@ public class ProjetoGUI extends javax.swing.JFrame {
 
         labelRegionNumber.setText("Label:");
 
+        btnClearSelection.setText("Clear Selection");
+        btnClearSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearSelectionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
@@ -359,6 +367,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnClearSelection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addComponent(paramTagName)
@@ -391,7 +400,9 @@ public class ProjetoGUI extends javax.swing.JFrame {
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(paramTagName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddTag))
-                .addContainerGap(259, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnClearSelection)
+                .addContainerGap(226, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
@@ -576,7 +587,17 @@ public class ProjetoGUI extends javax.swing.JFrame {
             textAreaLabels.setText(segmentation.getMapLabels().getLabels(annotation.getRegionSelected()));
             paramTagName.setText(null);
         }
+        
+        setImage(imageAnnotation, segmentation.getMarkedImage());
+        annotation.clearRegions();
     }//GEN-LAST:event_btnAddTagActionPerformed
+
+    private void btnClearSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearSelectionActionPerformed
+        // TODO add your handling code here:
+        annotation.clearRegions();
+        textAreaLabels.setText("");
+        setImage(imageAnnotation, segmentation.getMarkedImage());
+    }//GEN-LAST:event_btnClearSelectionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -620,6 +641,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddTag;
+    private javax.swing.JButton btnClearSelection;
     private javax.swing.JButton btnLoadImage;
     private javax.swing.JButton btnSegmentation;
     private javax.swing.JLabel imageAnnotation;

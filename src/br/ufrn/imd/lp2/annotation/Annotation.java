@@ -71,6 +71,10 @@ public class Annotation {
         }
     }
     
+    public void clearRegions(){
+        regions = new ArrayList<>();
+    }
+    
     public boolean regionsExist(int key){
         boolean resp = false;
         for(Integer i : regions){
