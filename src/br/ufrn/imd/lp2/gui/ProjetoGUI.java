@@ -46,6 +46,9 @@ public class ProjetoGUI extends javax.swing.JFrame {
         resetImageAreas();
     }
 
+    /**
+     * Inicializa e prepara as areas de visualizao para segmentacao
+     */
     public void resetImageAreas() {
         imageOriginal.setIcon(new ImageIcon());
         imageOriginal.setText("Original");
@@ -59,15 +62,12 @@ public class ProjetoGUI extends javax.swing.JFrame {
         labelTotalRegions.setText("");
     }
 
-    public int scale(int scaleA, int scaleB) {
-        if (scaleA < scaleB) {
-            return scaleA;
-        } else {
-            return scaleB;
-        }
-
-    }
-
+    /**
+     * Insere a imagem no local apropriado
+     *
+     * @param label
+     * @param buffer
+     */
     public void setImage(JLabel label, BufferedImage buffer) {
         if (buffer != null) {
             label.setIcon(new ImageIcon(buffer));
@@ -447,6 +447,11 @@ public class ProjetoGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Carrega as imagens (Original) na devida aba da GUI
+     *
+     * @param evt
+     */
     private void btnLoadImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadImageActionPerformed
         JFileChooser fc = new JFileChooser();
 
@@ -474,6 +479,12 @@ public class ProjetoGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnLoadImageActionPerformed
 
+    /**
+     * Realiza a segmentacao da imagem e carrega as imagens (Original, Marcada e
+     * Mapa de Rotulos) nas devidas abas da GUI
+     *
+     * @param evt
+     */
     private void btnSegmentationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSegmentationActionPerformed
         // TODO add your handling code here:
         if (buffer != null) {
@@ -502,6 +513,11 @@ public class ProjetoGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSegmentationActionPerformed
 
+    /**
+     * Seleciona a regiao no local clicado pelo mouse
+     *
+     * @param evt
+     */
     private void imageAnnotationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_imageAnnotationMouseClicked
         // TODO add your handling code here:
         int x, y, region;
@@ -527,24 +543,24 @@ public class ProjetoGUI extends javax.swing.JFrame {
             pixel = new Color(mask[i]);
 //            System.out.println(grayMap[i]);
 //            System.out.println(mask[i]);
-            if (region != grayMap[i] && 
-                !annotation.regionsExist(annotation.getRegionLabel(grayMap[i], segmentation.getRAW().getTotalRegions()))) {
-                
+            if (region != grayMap[i]
+                    && !annotation.isSelectedRegion(annotation.getRegionLabel(grayMap[i], segmentation.getRAW().getTotalRegions()))) {
+
                 r = pixel.getRed() * param / 100;
                 g = pixel.getGreen() * param / 100;
                 b = pixel.getBlue() * param / 100;
                 pixel = new Color(r, g, b);
 
                 mask[i] = pixel.getRGB();
-                
+
             } else {
 
-               r = pixel.getRed();
+                r = pixel.getRed();
                 g = pixel.getGreen();
                 b = pixel.getBlue();
                 pixel = new Color(r, g, b);
 
-                mask[i] = pixel.getRGB(); 
+                mask[i] = pixel.getRGB();
 
             }
         }
@@ -579,6 +595,11 @@ public class ProjetoGUI extends javax.swing.JFrame {
                 "Label: " + regionSelected);
     }//GEN-LAST:event_imageAnnotationMouseClicked
 
+    /**
+     * Insere um rotulo a imagem referente a regions selecionada
+     *
+     * @param evt
+     */
     private void btnAddTagActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTagActionPerformed
         // TODO add your handling code here:
         if (!paramTagName.getText().equals("")) {
@@ -587,11 +608,16 @@ public class ProjetoGUI extends javax.swing.JFrame {
             textAreaLabels.setText(segmentation.getMapLabels().getLabels(annotation.getRegionSelected()));
             paramTagName.setText(null);
         }
-        
+
         setImage(imageAnnotation, segmentation.getMarkedImage());
         annotation.clearRegions();
     }//GEN-LAST:event_btnAddTagActionPerformed
 
+    /**
+     * Limpa a imagem no processo de anotacao, reiniciando a selecao das regions
+     *
+     * @param evt
+     */
     private void btnClearSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearSelectionActionPerformed
         // TODO add your handling code here:
         annotation.clearRegions();

@@ -12,6 +12,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
+ * Classe que executa o processo de leitura e escrita em arquivo, que guarda as
+ * imagens segmentadas e anotadas
  *
  * @author edilvolima
  */
@@ -24,18 +26,18 @@ public class Persistence {
 
     private FileInputStream fileRead;
     private ObjectInputStream objRead;
-    
-    private final String PATH_APP = System.getProperty("user.dir");
-    
+
+    //Path de onde fica a aplicacao
+    private final String APP_PATH = System.getProperty("user.dir");
 
     public Persistence(Segmentation seg) {
         this.segmentation = seg;
-        System.out.println(PATH_APP);
+        System.out.println(APP_PATH);
     }
 
     public void save() {
         try {
-            fileWrite = new FileOutputStream(PATH_APP+"/data/base.dat");
+            fileWrite = new FileOutputStream(APP_PATH + "/data/base.dat");
 
             //Classe responsavel por inserir os objetos
             ObjectOutputStream objWrite = new ObjectOutputStream(fileWrite);
@@ -65,7 +67,7 @@ public class Persistence {
         try {
 
             //Carrega o arquivo
-            fileRead = new FileInputStream(PATH_APP+"/data/base.dat");
+            fileRead = new FileInputStream(APP_PATH + "/data/base.dat");
 
             //Classe responsavel por recuperar os objetos do arquivo
             objRead = new ObjectInputStream(fileRead);

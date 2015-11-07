@@ -16,16 +16,24 @@ import java.io.Serializable;
  *
  * @author edilvolima
  */
-public class Segmentation extends Images implements Serializable{
+public class Segmentation extends Images implements Serializable {
 
     private ImageInformation RAW;
     private MapRegion mapRegion;
     private int scaleSegmentation;
 
+    /**
+     * Construtor: Inicializa e segmenta a imagem pelo @param filepath
+     *
+     * @param filepath
+     * @param blur_level
+     * @param color_radius
+     * @param min_size
+     */
     public Segmentation(String filepath, double blur_level, double color_radius, double min_size) {
         super.setFilepath(filepath);
         mapRegion = new MapRegion();
-        
+
         RAW = ImageSegmentation.performSegmentation(filepath, blur_level, color_radius, min_size);
         scaleSegmentation = 255 / RAW.getTotalRegions();
 
@@ -33,6 +41,13 @@ public class Segmentation extends Images implements Serializable{
         mapRegion.getImage().setRGB(0, 0, RAW.getWidth(), RAW.getHeight(), grayMap(RAW.getSegmentedImageMap()), 0, RAW.getWidth());
     }
 
+    /**
+     * Converte a matriz da imagem segmentada para melhor visualizacao de acordo
+     * com o numero de regions geradas
+     *
+     * @param mtz
+     * @return
+     */
     public int[] grayMap(int[] mtz) {
         for (int i = 0; i < mtz.length; i++) {
             int pix = mtz[i];
@@ -44,6 +59,12 @@ public class Segmentation extends Images implements Serializable{
         return mtz;
     }
 
+    /**
+     * Retorna o ImageInformation que possui todos os dados oriundos da
+     * segmentacao
+     *
+     * @return
+     */
     public ImageInformation getRAW() {
         return RAW;
     }

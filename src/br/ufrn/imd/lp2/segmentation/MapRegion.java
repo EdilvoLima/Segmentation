@@ -14,14 +14,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
+ * Mapa de regioes onde guarda os rotulos de cada regiao
  *
  * @author edilvolima
  */
-public class MapRegion extends Images implements Tagging, Serializable{
-    
+public class MapRegion extends Images implements Tagging, Serializable {
+
     private HashMap<Integer, String> labels;
-    
-    public MapRegion(){
+
+    public MapRegion() {
         super();
         labels = new HashMap<>();
     }
@@ -35,14 +36,26 @@ public class MapRegion extends Images implements Tagging, Serializable{
         return labels.get(key);
     }
 
+    /**
+     * Insere uma tag (label) a uma regiao
+     *
+     * @param key
+     * @param tag
+     */
     public void setLabels(Integer key, String tag) {
         labels.put(key, tag);
     }
-    
-    public void setLabels(ArrayList<Integer> regions, String tag){
-        for(Integer key : regions){
+
+    /**
+     * Insere multiplas regioes na estrutura
+     *
+     * @param regions
+     * @param tag
+     */
+    public void setLabels(ArrayList<Integer> regions, String tag) {
+        for (Integer key : regions) {
             labels.put(key, tag);
         }
     }
-    
+
 }

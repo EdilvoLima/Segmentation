@@ -14,37 +14,40 @@ import java.util.Arrays;
  * @author edilvolima
  */
 public class Annotation {
-    
+
     private Integer regionSelected;
     private String tag;
     private ArrayList<Integer> regions;
 
     private int[] mask;
-    
-    public Annotation (){
+
+    public Annotation() {
         regionSelected = null;
         tag = "";
         regions = new ArrayList<>();
     }
-    
+
     //Retorna qual regions 
-    public Integer getRegionLabel(int c, int numRegions){
+    public Integer getRegionLabel(int c, int numRegions) {
         Color color = new Color(c);
-        
+
         return color.getRed() / numRegions;
     }
-    
-    //Cria uma mascara para 
-    public int[] createMask(int[] serial){
+
+    /**
+     * Cria uma mascara para highlight na imagem
+     *
+     * @param serial
+     * @return
+     */
+    public int[] createMask(int[] serial) {
         int[] mask = new int[serial.length];
-        for(int i = 0; i < serial.length; i++){
+        for (int i = 0; i < serial.length; i++) {
             mask[i] = serial[i];
         }
         return mask;
     }
-    
-    
-    
+
     public Integer getRegionSelected() {
         return regionSelected;
     }
@@ -65,33 +68,57 @@ public class Annotation {
         return regions;
     }
 
+    /**
+     * Adiciona uma regiao, que deve ficar em evidencia em multi selecao
+     *
+     * @param region
+     */
     public void addRegion(int region) {
-        if(!regionsExist(region)){
+        if (!isSelectedRegion(region)) {
             regions.add(region);
         }
     }
-    
-    public void clearRegions(){
+
+    /**
+     * Reseta lista de regioes selecionadas
+     */
+    public void clearRegions() {
         regions = new ArrayList<>();
     }
-    
-    public boolean regionsExist(int key){
+
+    /**
+     * Verificas se regiao ja foi selecionada
+     *
+     * @param key
+     * @return
+     */
+    public boolean isSelectedRegion(int key) {
         boolean resp = false;
-        for(Integer i : regions){
-            if(i == key) resp = true;
-        }   
+        for (Integer i : regions) {
+            if (i == key) {
+                resp = true;
+            }
+        }
         return resp;
     }
 
-    public void printRegions(){
+    /**
+     * Imprime regions selecionadas
+     */
+    public void printRegions() {
         System.out.print("{");
-        for(Integer region : regions){
+        for (Integer region : regions) {
             System.out.print(region);
         }
         System.out.println("}");
     }
-    
-    public void highlightRegion(int regionSelected){
-       
+
+    /**
+     * Aplica highlight em regiao selecionada
+     *
+     * @param regionSelected
+     */
+    public void highlightRegion(int regionSelected) {
+
     }
 }
