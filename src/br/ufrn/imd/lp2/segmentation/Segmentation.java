@@ -51,10 +51,11 @@ public class Segmentation extends Images implements Serializable {
     public int[] grayMap(int[] mtz) {
         for (int i = 0; i < mtz.length; i++) {
             int pix = mtz[i];
-
+            
             Color c = new Color(scaleSegmentation * pix, scaleSegmentation * pix, scaleSegmentation * pix);
 
             mtz[i] = c.getRGB();
+            
         }
         return mtz;
     }
@@ -81,7 +82,7 @@ public class Segmentation extends Images implements Serializable {
         return RAW.getRegionMarkedImage();
     }
 
-    public int getScaleSegmentarion() {
+    public int getScaleSegmentation() {
         return scaleSegmentation;
     }
 

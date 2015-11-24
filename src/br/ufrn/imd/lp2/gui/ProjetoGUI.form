@@ -454,7 +454,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="btnClearSelection" max="32767" attributes="0"/>
@@ -478,6 +478,7 @@
                                       </Group>
                                   </Group>
                               </Group>
+                              <Component id="btnFinishAnnotation" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -502,7 +503,9 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnClearSelection" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="226" max="32767" attributes="0"/>
+                          <EmptySpace pref="187" max="32767" attributes="0"/>
+                          <Component id="btnFinishAnnotation" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -557,6 +560,14 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearSelectionActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnFinishAnnotation">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Finish Annotation"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFinishAnnotationActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

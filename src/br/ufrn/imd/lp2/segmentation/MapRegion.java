@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Mapa de regioes onde guarda os rotulos de cada regiao
@@ -20,11 +21,11 @@ import java.util.HashMap;
  */
 public class MapRegion extends Images implements Tagging, Serializable {
 
-    private HashMap<Integer, String> labels;
+    private TreeMap<Integer, String> labels;
 
     public MapRegion() {
         super();
-        labels = new HashMap<>();
+        labels = new TreeMap<>();
     }
 
     @Override

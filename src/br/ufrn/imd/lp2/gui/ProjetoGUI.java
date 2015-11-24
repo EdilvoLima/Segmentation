@@ -39,6 +39,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
         initComponents();
         buffer = new Images();
         configSetup();
+        persistence = new Persistence();
     }
 
     public void configSetup() {
@@ -121,6 +122,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
         labelHihlightLevel = new javax.swing.JLabel();
         labelRegionNumber = new javax.swing.JLabel();
         btnClearSelection = new javax.swing.JButton();
+        btnFinishAnnotation = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -360,6 +362,13 @@ public class ProjetoGUI extends javax.swing.JFrame {
             }
         });
 
+        btnFinishAnnotation.setText("Finish Annotation");
+        btnFinishAnnotation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFinishAnnotationActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
@@ -382,7 +391,8 @@ public class ProjetoGUI extends javax.swing.JFrame {
                             .addGroup(jPanel8Layout.createSequentialGroup()
                                 .addComponent(labelHihlightLevel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                                .addComponent(paramHighlightLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(paramHighlightLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(btnFinishAnnotation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel8Layout.setVerticalGroup(
@@ -402,7 +412,9 @@ public class ProjetoGUI extends javax.swing.JFrame {
                     .addComponent(btnAddTag))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClearSelection)
-                .addContainerGap(226, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 187, Short.MAX_VALUE)
+                .addComponent(btnFinishAnnotation)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
@@ -459,6 +471,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
         if (res == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             buffer.setFilepath(file.getAbsolutePath());
+            buffer.setFileName(file.getName());
 
             try {
                 buffer.setImage(ImageIO.read(file));
@@ -493,6 +506,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
                     (double) paramMinSize.getValue());
 
             annotation = new Annotation();
+            segmentation.setFileName(buffer.getFileName());
 
             labelTotalRegions.setText("Gererated Regions: " + segmentation.getRAW().getTotalRegions());
 
@@ -508,8 +522,9 @@ public class ProjetoGUI extends javax.swing.JFrame {
             //Muda a visão para a imagem segmentada
             jTabbedPane1.setSelectedIndex(jTabbedPane1.indexOfTab("Marked"));
 
-            persistence = new Persistence(segmentation);
-            persistence.save();
+            
+            persistence.save(segmentation);
+//            persistence.read();
         }
     }//GEN-LAST:event_btnSegmentationActionPerformed
 
@@ -525,43 +540,55 @@ public class ProjetoGUI extends javax.swing.JFrame {
         int[] mask, grayMap;
         int r, g, b;
         int param = (int) paramHighlightLevel.getValue();
-        Color pixel;
+        Color pixel = new Color(0,0,0);
         //buffer.setImage(new BufferedImage(segmentation.getRAW().getWidth(), segmentation.getRAW().getHeight(), 1));
 
-        buffer.setImage(segmentation.getOriginalImage());
+        buffer.setImage(segmentation.getMarkedImage());
         x = evt.getX();
         y = evt.getY();
 
+        //region = segmentation.getMapLabels().getImage().getRGB(x, y);
         region = segmentation.getMapLabels().getImage().getRGB(x, y);
-
+        
+        regionSelected = new Color(region).getRed() / segmentation.getScaleSegmentation();
+        
+        System.out.println(regionSelected);
         mask = annotation.createMask(segmentation.getRAW().getRegionMarkedPixels());
         //mask = segmentation.getRAW().getOriginalPixels();
         grayMap = segmentation.getRAW().getSegmentedImageMap();
+        
+        annotation.addRegion(regionSelected);
 
         //Selecao de regioes
         for (int i = 0; i < mask.length; i++) {
             pixel = new Color(mask[i]);
-//            System.out.println(grayMap[i]);
-//            System.out.println(mask[i]);
+//            System.out.print(grayMap[i]);
+//            System.out.print(mask[i]);
+//            System.out.print(region);
             if (region != grayMap[i]
-                    && !annotation.isSelectedRegion(annotation.getRegionLabel(grayMap[i], segmentation.getRAW().getTotalRegions()))) {
-
+                    && !annotation.isSelectedRegion(annotation.getRegionLabel(grayMap[i], segmentation.getScaleSegmentation()))) {
+//                System.out.print(grayMap[i]);
+//                System.out.print(mask[i]);
+//                System.out.print(region);    
+//                System.out.println("OK");
                 r = pixel.getRed() * param / 100;
                 g = pixel.getGreen() * param / 100;
                 b = pixel.getBlue() * param / 100;
                 pixel = new Color(r, g, b);
 
                 mask[i] = pixel.getRGB();
+//                System.out.println("==="+mask[i]);
 
             } else {
-
-                r = pixel.getRed();
-                g = pixel.getGreen();
-                b = pixel.getBlue();
-                pixel = new Color(r, g, b);
+//                System.out.print(grayMap[i]);
+//                System.out.print(mask[i]);
+//                System.out.print(region);
+//                System.out.println("NOT");
+//               
+//                pixel = new Color(pixel.getRGB());
 
                 mask[i] = pixel.getRGB();
-
+//                System.out.println(mask[i]);
             }
         }
 
@@ -574,9 +601,10 @@ public class ProjetoGUI extends javax.swing.JFrame {
         this.setImage(imageAnnotation, buffer.getImage());
 
         //Guarda o numero da regiao selecionada
-        regionSelected = annotation.getRegionLabel(region, segmentation.getRAW().getTotalRegions());
-
+        //regionSelected = annotation.getRegionLabel(region, segmentation.getRAW().getTotalRegions());
         System.out.println(regionSelected);
+
+        //System.out.println(regionSelected);
 
         annotation.setRegionSelected(regionSelected);
 
@@ -625,6 +653,11 @@ public class ProjetoGUI extends javax.swing.JFrame {
         setImage(imageAnnotation, segmentation.getMarkedImage());
     }//GEN-LAST:event_btnClearSelectionActionPerformed
 
+    private void btnFinishAnnotationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishAnnotationActionPerformed
+        // TODO add your handling code here:
+        persistence.save(segmentation);
+    }//GEN-LAST:event_btnFinishAnnotationActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -668,6 +701,7 @@ public class ProjetoGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddTag;
     private javax.swing.JButton btnClearSelection;
+    private javax.swing.JButton btnFinishAnnotation;
     private javax.swing.JButton btnLoadImage;
     private javax.swing.JButton btnSegmentation;
     private javax.swing.JLabel imageAnnotation;

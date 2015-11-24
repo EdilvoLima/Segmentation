@@ -28,10 +28,10 @@ public class Annotation {
     }
 
     //Retorna qual regions 
-    public Integer getRegionLabel(int c, int numRegions) {
+    public Integer getRegionLabel(int c, int scale) {
         Color color = new Color(c);
-
-        return color.getRed() / numRegions;
+        return color.getRed()/scale;
+        
     }
 
     /**
@@ -108,7 +108,7 @@ public class Annotation {
     public void printRegions() {
         System.out.print("{");
         for (Integer region : regions) {
-            System.out.print(region);
+            System.out.print(region +", ");
         }
         System.out.println("}");
     }
